@@ -3,11 +3,12 @@
 """Extract daily Screen Time totals from macOS knowledgeC.db to CSV."""
 
 import argparse
+import calendar
 import csv
 import os
 import sqlite3
 import sys
-from datetime import datetime
+from datetime import date, datetime
 
 KNOWLEDGE_DB = os.path.expanduser(
     "~/Library/Application Support/Knowledge/knowledgeC.db"
@@ -22,7 +23,7 @@ FROM
     LEFT JOIN ZSOURCE ON ZOBJECT.ZSOURCE = ZSOURCE.Z_PK
 WHERE
     ZSTREAMNAME = '/app/usage'
-    AND date((ZOBJECT.ZSTARTDATE + 978307200), 'unixepoch', 'localtime') >= date('now', '-30 days')
+    AND date((ZOBJECT.ZSTARTDATE + 978307200), 'unixepoch', 'localtime') BETWEEN ? AND ?
     {device_filter}
 GROUP BY
     date
@@ -46,13 +47,20 @@ def check_database():
         sys.exit(1)
 
 
-def query_screentime(mac_only=False):
-    """Query the past 30 days of daily screen time."""
+def month_range(year, month):
+    """Return the first and last date strings for a given month."""
+    last_day = calendar.monthrange(year, month)[1]
+    return f"{year:04d}-{month:02d}-01", f"{year:04d}-{month:02d}-{last_day:02d}"
+
+
+def query_screentime(year, month, mac_only=False):
+    """Query daily screen time for a specific month."""
     device_filter = "AND ZSOURCE.ZDEVICEID IS NULL" if mac_only else ""
     query = QUERY.format(device_filter=device_filter)
+    start_date, end_date = month_range(year, month)
     db_uri = f"file:{KNOWLEDGE_DB}?mode=ro"
     with sqlite3.connect(db_uri, uri=True) as con:
-        rows = con.execute(query).fetchall()
+        rows = con.execute(query, (start_date, end_date)).fetchall()
 
     results = []
     for date_str, hours in rows:
@@ -71,20 +79,37 @@ def write_csv(rows, output):
 
 def main():
     """CLI entry point."""
+    today = date.today()
+    if today.month == 1:
+        default_month = f"{today.year - 1:04d}-12"
+    else:
+        default_month = f"{today.year:04d}-{today.month - 1:02d}"
+
     parser = argparse.ArgumentParser(
-        description="Export past 30 days of macOS Screen Time as CSV."
+        description="Export macOS Screen Time as a daily CSV summary."
     )
     parser.add_argument("-o", "--output", help="Output file path (default: stdout)")
+    parser.add_argument(
+        "--month",
+        default=default_month,
+        help="Month to export as YYYY-MM (default: previous month)",
+    )
     parser.add_argument(
         "--mac-only", action="store_true", help="Exclude iOS device data"
     )
     args = parser.parse_args()
 
+    try:
+        dt = datetime.strptime(args.month, "%Y-%m")
+    except ValueError:
+        print(f"Invalid month format: {args.month} (expected YYYY-MM)", file=sys.stderr)
+        sys.exit(1)
+
     check_database()
-    rows = query_screentime(mac_only=args.mac_only)
+    rows = query_screentime(dt.year, dt.month, mac_only=args.mac_only)
 
     if not rows:
-        print("No Screen Time data found for the past 30 days.", file=sys.stderr)
+        print(f"No Screen Time data found for {args.month}.", file=sys.stderr)
         sys.exit(0)
 
     if args.output:
