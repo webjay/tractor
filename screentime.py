@@ -73,6 +73,7 @@ def write_csv(rows, output):
 
 
 def main():
+    """CLI entry point."""
     parser = argparse.ArgumentParser(
         description="Export past 30 days of macOS Screen Time as CSV."
     )
@@ -90,7 +91,7 @@ def main():
         sys.exit(0)
 
     if args.output:
-        with open(args.output, "w", newline="") as f:
+        with open(args.output, "w", newline="", encoding="utf-8") as f:
             write_csv(rows, f)
         print(f"Written {len(rows)} days to {args.output}", file=sys.stderr)
     else:

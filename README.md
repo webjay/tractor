@@ -1,6 +1,6 @@
 # Tractor
 
-Export macOS Screen Time data as a daily CSV summary.
+Export  Screen Time data as a daily CSV summary.
 
 Reads the `knowledgeC.db` database and outputs one row per day with total hours across all devices.
 
