@@ -14,6 +14,8 @@ To include iOS Screen Time data, enable "Share across devices" on devices signed
 
 ## Usage
 
+Exports the previous month by default:
+
 ```
 python3 screentime.py
 ```
@@ -22,8 +24,15 @@ Output:
 
 ```csv
 date,day,hours
-2026-04-10,Thu,8.3
-2026-04-09,Wed,7.1
+2026-03-20,Fri,2.2
+2026-03-22,Sun,4.6
+2026-03-23,Mon,5.6
+```
+
+Export a specific month:
+
+```
+python3 screentime.py --month 2026-04
 ```
 
 Write to a file:
