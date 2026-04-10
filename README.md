@@ -1,35 +1,40 @@
-# ScreenTime2CSV
+# Tractor
 
-ScreenTime2CSV is a Python script to query Screen Time data from the macOS knowledgeC.db database and export it to CSV format.
+Export macOS Screen Time data as a daily CSV summary.
 
-## Requirements for reading iOS Screen Time
-- MacOS device signed into the same iCloud account
-- Screen Time "Share across devices" enabled
+Reads the `knowledgeC.db` database and outputs one row per day with total hours across all devices.
 
-More info in my blog post [Exporting and analyzing iOS Screen Time usage](https://felixkohlhas.com/projects/screentime/) 
+## Requirements
+
+- macOS with Screen Time enabled
+- Python 3.9+
+- Full Disk Access granted to your terminal app (System Settings > Privacy & Security > Full Disk Access)
+
+To include iOS Screen Time data, enable "Share across devices" on devices signed into the same iCloud account.
 
 ## Usage
 
 ```
-usage: screentime2csv.py [-h] [-o OUTPUT] [-d DELIMITER]
-
-Query knowledge database
-
-options:
-  -h, --help            show this help message and exit
-  -o OUTPUT, --output OUTPUT
-                        Output file path
-  -d DELIMITER, --delimiter DELIMITER
-                        Delimiter for output file (default: comma)
+python3 screentime.py
 ```
 
-## Example
-```bash
-python screentime2csv.py -o output.csv
-```
-This command will export Screen Time data to output.csv using comma as the delimiter.
+Output:
 
-```bash
-python3 screentime2csv.py -o output.tsv -d '\t'
+```csv
+date,day,hours
+2026-04-10,Thu,8.3
+2026-04-09,Wed,7.1
 ```
-This command will export Screen Time data to output.tsv using tabs as the delimiter.
+
+Write to a file:
+
+```
+python3 screentime.py -o report.csv
+```
+
+## Install
+
+```
+pip install .
+tractor
+```
