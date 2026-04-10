@@ -1,0 +1,17 @@
+[project]
+name = "tractor"
+version = "1.0.0"
+description = "Export macOS Screen Time data as a daily CSV summary"
+requires-python = ">=3.9"
+license = "MIT"
+
+[project.scripts]
+tractor = "screentime:main"
+
+[tool.ruff]
+target-version = "py39"
+
+[tool.ruff.lint]
+preview = true
+select = ["D", "E", "F", "I", "PL", "W"]
+ignore = ["D203", "D213", "E501"]
