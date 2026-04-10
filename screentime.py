@@ -8,7 +8,6 @@ import os
 import sqlite3
 import sys
 from datetime import datetime
-from io import StringIO
 
 KNOWLEDGE_DB = os.path.expanduser(
     "~/Library/Application Support/Knowledge/knowledgeC.db"
@@ -30,8 +29,6 @@ GROUP BY
 ORDER BY
     date
 """
-
-DAY_NAMES = ["Mon", "Tue", "Wed", "Thu", "Fri", "Sat", "Sun"]
 
 
 def check_database():
@@ -59,8 +56,7 @@ def query_screentime(mac_only=False):
 
     results = []
     for date_str, hours in rows:
-        dt = datetime.strptime(date_str, "%Y-%m-%d")
-        day_name = DAY_NAMES[dt.weekday()]
+        day_name = datetime.strptime(date_str, "%Y-%m-%d").strftime("%a")
         results.append((date_str, day_name, hours))
 
     return results
@@ -96,9 +92,7 @@ def main():
             write_csv(rows, f)
         print(f"Written {len(rows)} days to {args.output}", file=sys.stderr)
     else:
-        output = StringIO()
-        write_csv(rows, output)
-        print(output.getvalue(), end="")
+        write_csv(rows, sys.stdout)
 
 
 if __name__ == "__main__":
