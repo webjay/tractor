@@ -1,4 +1,5 @@
 #!/usr/bin/env python3
+
 """Extract daily Screen Time totals from macOS knowledgeC.db to CSV."""
 
 import argparse
@@ -6,7 +7,7 @@ import csv
 import os
 import sqlite3
 import sys
-from datetime import datetime, timedelta
+from datetime import datetime
 from io import StringIO
 
 KNOWLEDGE_DB = os.path.expanduser(
