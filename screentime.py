@@ -19,9 +19,11 @@ SELECT
     round(sum(ZOBJECT.ZENDDATE - ZOBJECT.ZSTARTDATE) / 3600.0, 1) AS hours
 FROM
     ZOBJECT
+    LEFT JOIN ZSOURCE ON ZOBJECT.ZSOURCE = ZSOURCE.Z_PK
 WHERE
     ZSTREAMNAME = '/app/usage'
     AND date((ZOBJECT.ZSTARTDATE + 978307200), 'unixepoch', 'localtime') >= date('now', '-30 days')
+    {device_filter}
 GROUP BY
     date
 ORDER BY
@@ -46,10 +48,12 @@ def check_database():
         sys.exit(1)
 
 
-def query_screentime():
+def query_screentime(mac_only=False):
     """Query the past 30 days of daily screen time."""
+    device_filter = "AND ZSOURCE.ZDEVICEID IS NULL" if mac_only else ""
+    query = QUERY.format(device_filter=device_filter)
     with sqlite3.connect(KNOWLEDGE_DB) as con:
-        rows = con.execute(QUERY).fetchall()
+        rows = con.execute(query).fetchall()
 
     results = []
     for date_str, hours in rows:
@@ -72,10 +76,13 @@ def main():
         description="Export past 30 days of macOS Screen Time as CSV."
     )
     parser.add_argument("-o", "--output", help="Output file path (default: stdout)")
+    parser.add_argument(
+        "--mac-only", action="store_true", help="Exclude iOS device data"
+    )
     args = parser.parse_args()
 
     check_database()
-    rows = query_screentime()
+    rows = query_screentime(mac_only=args.mac_only)
 
     if not rows:
         print("No Screen Time data found for the past 30 days.", file=sys.stderr)
