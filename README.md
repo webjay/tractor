@@ -1,6 +1,6 @@
 # Tractor
 
-Export  Screen Time data as a daily CSV summary.
+Export macOS Screen Time data as a daily CSV summary.
 
 Reads the `knowledgeC.db` database and outputs one row per day with total hours across all devices.
 
@@ -30,6 +30,12 @@ Write to a file:
 
 ```
 python3 screentime.py -o report.csv
+```
+
+Exclude iOS devices (Mac only):
+
+```
+python3 screentime.py --mac-only
 ```
 
 ## Install
