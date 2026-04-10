@@ -53,7 +53,8 @@ def query_screentime(mac_only=False):
     """Query the past 30 days of daily screen time."""
     device_filter = "AND ZSOURCE.ZDEVICEID IS NULL" if mac_only else ""
     query = QUERY.format(device_filter=device_filter)
-    with sqlite3.connect(KNOWLEDGE_DB) as con:
+    db_uri = f"file:{KNOWLEDGE_DB}?mode=ro"
+    with sqlite3.connect(db_uri, uri=True) as con:
         rows = con.execute(query).fetchall()
 
     results = []
