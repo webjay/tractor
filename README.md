@@ -7,7 +7,7 @@ Reads the `knowledgeC.db` database and outputs one row per day with total hours 
 ## Requirements
 
 - macOS with Screen Time enabled
-- Python 3.9+
+- Python 3.14+
 - Full Disk Access granted to your terminal app (System Settings > Privacy & Security > Full Disk Access)
 
 To include iOS Screen Time data, enable "Share across devices" on devices signed into the same iCloud account.
